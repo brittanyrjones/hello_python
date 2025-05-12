@@ -8,7 +8,7 @@ on:
     paths:
       - 'pyproject.toml'
       - 'CHANGELOG.md'
-      - 'hello_world/**'
+      - 'hello_python/**'
 
 jobs:
   test-compatibility:
@@ -39,7 +39,7 @@ jobs:
     
     - name: Check test coverage
       run: |
-        pytest --cov=hello_world --cov-report=term-missing tests/test_pypi_package.py
+        pytest --cov=hello_python --cov-report=term-missing tests/test_pypi_package.py
 
     - name: Clean up coverage files
       run: |
