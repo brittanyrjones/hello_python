@@ -39,7 +39,37 @@ else
     CURRENT_VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
 fi
 
+# Split version into components, handling beta/alpha versions
+if [[ $CURRENT_VERSION =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)([a-z]+[0-9]*)?$ ]]; then
+    MAJOR="${BASH_REMATCH[1]}"
+    MINOR="${BASH_REMATCH[2]}"
+    PATCH="${BASH_REMATCH[3]}"
+    SUFFIX="${BASH_REMATCH[4]}"
+else
+    echo "Error: Invalid version format: $CURRENT_VERSION"
+    exit 1
+fi
+
+# Generate new version based on bump type
+case "$BUMP_TYPE" in
+    major)
+        NEW_VERSION="$((MAJOR + 1)).0.0"
+        ;;
+    minor)
+        NEW_VERSION="$MAJOR.$((MINOR + 1)).0"
+        ;;
+    patch)
+        NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
+        ;;
+esac
+
+# Add release type suffix if needed
+if [ "$RELEASE_TYPE" != "stable" ]; then
+    NEW_VERSION="${NEW_VERSION}-${RELEASE_TYPE}"
+fi
+
 echo "Current version: $CURRENT_VERSION"
+echo "New version: $NEW_VERSION"
 echo "Bump type: $BUMP_TYPE"
 echo "Release type: $RELEASE_TYPE"
 
