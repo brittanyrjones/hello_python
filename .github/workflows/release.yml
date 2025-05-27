@@ -14,7 +14,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-            name: build-artifacts-${{ github.ref_name }}
+            name: release-artifacts-${{ github.ref_name }}
             path: dist/
             merge-multiple: true
 

@@ -40,7 +40,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-artifacts-${{ github.event.inputs.build_ref || github.ref_name }}
+          name: release-artifacts-${{ github.event.inputs.build_ref || github.ref_name }}
           path: dist/
           merge-multiple: true
 
