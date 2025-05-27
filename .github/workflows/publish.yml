@@ -4,6 +4,19 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      build_ref:
+        description: 'Branch, tag, or commit SHA to publish to testpypi'
+        required: true
+        default: 'main'
+      target:
+        description: 'Target repository to publish to'
+        required: true
+        default: 'testpypi'
+        type: choice
+        options:
+          - testpypi
 
 jobs:
   check_for_moratorium:
@@ -13,7 +26,7 @@ jobs:
       - uses: actions/checkout@v4
       - env:
           TPS_API_TOKEN: ${{ secrets.TPS_API_TOKEN_PARAM }}
-        run: ./scripts/release/tps-check-lock heroku-applink-python ${{ github.sha }}
+        run: ./scripts/release/tps-check-lock hello_python ${{ github.sha }}
 
   publish:
     needs: check_for_moratorium
@@ -25,8 +38,8 @@ jobs:
       - name: Download build artifacts
         uses: dawidd6/action-download-artifact@v2
         with:
-          workflow: package.yml
-          name: ${{ github.ref_name }}
+          workflow: test-lint-build.yml
+          name: ${{ github.event.inputs.build_ref || github.ref_name }}
           path: dist
 
       - name: Release to GitHub
@@ -36,11 +49,16 @@ jobs:
             dist/*.whl
             dist/*.tar.gz
 
+      - name: Release to Test PyPI
+        if: ${{ github.event.inputs.target == 'testpypi' }}
+        run: uv publish --repository https://test.pypi.org/legacy/ dist/*
+
       - name: Release to PyPI
+        if: ${{ github.event.inputs.target == 'pypi' }}
         run: uv publish dist/*
 
       - name: Publish To Change Management
         env:
           ACTOR_EMAIL: ${{ secrets.TPS_API_RELEASE_ACTOR_EMAIL }}
           TPS_API_TOKEN: ${{ secrets.TPS_API_TOKEN_PARAM }}
-        run: ./scripts/release/tps-record-release heroku-applink-python ${{ github.sha }}
+        run: ./scripts/release/tps-record-release hello_python ${{ github.sha }}
