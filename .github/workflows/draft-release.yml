@@ -37,4 +37,8 @@ jobs:
         run: |
           pwd
           ls -la
+          echo "Checking for pyproject.toml:"
+          ls -la pyproject.toml
+          echo "Checking for scripts:"
+          ls -la scripts/release/
           ./scripts/release/draft-release "${{ github.event.inputs.bump_type }}" "${{ github.event.inputs.previous_version }}"
