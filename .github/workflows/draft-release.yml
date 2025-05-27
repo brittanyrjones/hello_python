@@ -25,9 +25,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Make script executable
-        run: chmod +x scripts/release/draft-release
-
-      - name: Run draft release script
+      - name: Create release branch
         run: |
-          ./scripts/release/draft-release "${{ github.event.inputs.bump_type }}" "stable" "${{ github.event.inputs.previous_version }}"
+          chmod +x scripts/release/draft-release
+          ./scripts/release/draft-release "${{ github.event.inputs.bump_type }}" "${{ github.event.inputs.previous_version }}"
