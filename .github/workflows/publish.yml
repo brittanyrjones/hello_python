@@ -1,9 +1,8 @@
-name: Publish Release to Github, PyPI, and Change Management
+name: Publish to PyPI
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       build_ref:
@@ -17,6 +16,9 @@ on:
         type: choice
         options:
           - testpypi
+
+permissions:
+  contents: read
 
 jobs:
   check_for_moratorium:
@@ -36,26 +38,14 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Download build artifacts
-        uses: dawidd6/action-download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
-          workflow: test-lint-build.yml
           name: ${{ github.event.inputs.build_ref || github.ref_name }}
-          path: dist
-
-      - name: Release to GitHub
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            dist/*.whl
-            dist/*.tar.gz
+          path: dist/
 
       - name: Release to Test PyPI
         if: ${{ github.event.inputs.target == 'testpypi' }}
         run: uv publish --repository https://test.pypi.org/legacy/ dist/*
-
-      - name: Release to PyPI
-        if: ${{ github.event.inputs.target == 'pypi' }}
-        run: uv publish dist/*
 
       - name: Publish To Change Management
         env:
