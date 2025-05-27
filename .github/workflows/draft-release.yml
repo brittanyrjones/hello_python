@@ -33,12 +33,8 @@ jobs:
 
       - name: Authenticate GitHub CLI
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if ! echo "$GITHUB_TOKEN" | gh auth login --with-token; then
-            echo "Failed to authenticate with GitHub CLI"
-            exit 1
-          fi
           if ! gh auth status; then
             echo "GitHub CLI authentication failed"
             exit 1
@@ -51,6 +47,6 @@ jobs:
 
       - name: Create release branch
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ./scripts/release/draft-release "${{ github.event.inputs.bump_type }}" "${{ github.event.inputs.previous_version }}"
