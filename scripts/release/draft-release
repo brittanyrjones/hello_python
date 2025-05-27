@@ -183,71 +183,48 @@ echo "Successfully pushed branch $BRANCH_NAME"
 # Create PR
 echo "Creating pull request..."
 
-# Construct PR body from template
-PR_TEMPLATE=".github/PULL_REQUEST_TEMPLATE.md"
-TEMP_PR_BODY=$(mktemp)
-trap 'rm -f "$TEMP_PR_BODY"' EXIT
-
-# Get git log since previous tag
-PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-if [ -n "$PREV_TAG" ]; then
-    GIT_LOG=$(git log --pretty=format:"- %s" "$PREV_TAG"..HEAD)
+# Try using gh CLI if available and authenticated
+if command -v gh &> /dev/null && gh auth status &> /dev/null; then
+    if ! gh pr create \
+        --title "Release v$NEW_VERSION" \
+        --body "$PR_BODY" \
+        --base main \
+        --head "release-v$NEW_VERSION" \
+        --draft; then
+        echo "Error: Failed to create pull request with gh CLI"
+        exit 1
+    fi
+    echo "Successfully created pull request with gh CLI"
 else
-    GIT_LOG=$(git log --pretty=format:"- %s" HEAD)
+    # Fallback to curl with GH_TOKEN
+    if [ -z "${GH_TOKEN:-}" ]; then
+        echo "Error: GH_TOKEN environment variable is not set and gh CLI is not available/authenticated."
+        exit 1
+    fi
+
+    # Get the repository name from git config
+    REPO_URL=$(git config --get remote.origin.url)
+    REPO_OWNER=$(echo "$REPO_URL" | sed -E 's/.*github.com[:/]([^/]+)\/([^/]+).*/\1/')
+    REPO_NAME=$(echo "$REPO_URL" | sed -E 's/.*github.com[:/]([^/]+)\/([^/]+).*/\2/' | sed 's/\\.git$//')
+
+    PR_RESPONSE=$(curl -s -X POST \
+      -H "Authorization: token $GH_TOKEN" \
+      -H "Accept: application/vnd.github.v3+json" \
+      "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/pulls" \
+      -d "{
+        \"title\": \"Release v$NEW_VERSION\",
+        \"body\": \"$PR_BODY\",
+        \"head\": \"release-v$NEW_VERSION\",
+        \"base\": \"main\",
+        \"draft\": true
+      }")
+
+    if echo "$PR_RESPONSE" | grep -q "message.*Not Found"; then
+        echo "Error: Failed to create pull request with curl"
+        echo "API Response: $PR_RESPONSE"
+        exit 1
+    fi
+    echo "Successfully created pull request with curl"
 fi
-
-# Default PR body if no template
-PR_BODY="## Changes\n\n- Updated version to $NEW_VERSION\n- Updated CHANGELOG.md with all changes since the previous release.\n\n## Checklist\n- [ ] Review changelog entries\n- [ ] Verify version bump\n- [ ] Test the changes\n- [ ] Approve the release\n- [ ] I've added or updated unit tests where necessary\n- [ ] I've added or updated documentation\n- [ ] I've run \`pdoc3\` to generate the documentation\n- [ ] I've manually tested the functionality in this PR\n- [ ] This pull request is ready for review"
-
-if [ -f "$PR_TEMPLATE" ]; then
-    # Create a temporary file with the template
-    cp "$PR_TEMPLATE" "$TEMP_PR_BODY"
-
-    # Add our changes to the Summary section
-    sed -i '' '/^## Summary$/a\
-- Updated version to '"$NEW_VERSION"'\
-- Updated CHANGELOG.md with all changes since the previous release.' "$TEMP_PR_BODY"
-
-    # Add git log to What Changed section
-    echo "$GIT_LOG" > "$TEMP_PR_BODY.tmp"
-    sed -i '' '/^## What Changed$/r '"$TEMP_PR_BODY.tmp" "$TEMP_PR_BODY"
-    rm "$TEMP_PR_BODY.tmp"
-
-    # Add our checklist items
-    sed -i '' '/^## Checklist$/a\
-- [ ] Review changelog entries\
-- [ ] Verify version bump\
-- [ ] Test the changes\
-- [ ] Approve the release' "$TEMP_PR_BODY"
-
-    PR_BODY=$(cat "$TEMP_PR_BODY")
-fi
-
-# Get the repository name from git config
-REPO_URL=$(git config --get remote.origin.url)
-REPO_OWNER=$(echo "$REPO_URL" | sed -E 's/.*github.com[:/]([^/]+)\/([^/]+).*/\1/')
-REPO_NAME=$(echo "$REPO_URL" | sed -E 's/.*github.com[:/]([^/]+)\/([^/]+).*/\2/' | sed 's/\.git$//')
-
-# Create PR using GitHub API
-PR_RESPONSE=$(curl -s -X POST \
-  -H "Authorization: token $GH_TOKEN" \
-  -H "Accept: application/vnd.github.v3+json" \
-  "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/pulls" \
-  -d "{
-    \"title\": \"Release v$NEW_VERSION\",
-    \"body\": \"$PR_BODY\",
-    \"head\": \"release-v$NEW_VERSION\",
-    \"base\": \"main\",
-    \"draft\": true
-  }")
-
-# Check if PR creation was successful
-if echo "$PR_RESPONSE" | grep -q "message.*Not Found"; then
-    echo "Error: Failed to create pull request"
-    echo "API Response: $PR_RESPONSE"
-    exit 1
-fi
-
-echo "Successfully created pull request"
 
 echo "Done! Review the changes and merge the pull request when ready."
