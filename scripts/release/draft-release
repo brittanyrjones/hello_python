@@ -135,21 +135,21 @@ if ! git checkout -b "$BRANCH_NAME"; then
     exit 1
 fi
 
-# Make the update-release-documentation.sh script executable
-if [ ! -f "scripts/release/update-release-documentation.sh" ]; then
-    echo "Error: update-release-documentation.sh not found"
+# Make the update-release-documentation script executable
+if [ ! -f "scripts/release/update-release-documentation" ]; then
+    echo "Error: update-release-documentation not found"
     git checkout main
     git branch -D "$BRANCH_NAME"
     exit 1
 fi
 
-chmod +x scripts/release/update-release-documentation.sh
+chmod +x scripts/release/update-release-documentation
 
 # Get the absolute path of the script's directory
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-# Call the update-release-documentation.sh script with the new version
-if ! "$SCRIPT_DIR/update-release-documentation.sh" "$NEW_VERSION" "$PREV_VERSION"; then
+# Call the update-release-documentation script with the new version
+if ! "$SCRIPT_DIR/update-release-documentation" "$NEW_VERSION" "$PREV_VERSION"; then
     echo "Error: Failed to update release documentation"
     git checkout main
     git branch -D "$BRANCH_NAME"

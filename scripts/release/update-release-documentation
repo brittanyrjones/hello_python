@@ -5,7 +5,7 @@ set -o pipefail
 # Script to update version in pyproject.toml and CHANGELOG.md with git log entries since last tag
 #
 # Usage:
-#   ./scripts/release/update-documentation.sh 0.1.1
+#   ./scripts/release/update-documentation 0.1.1
 #
 # This will:
 #   1. Update the version in pyproject.toml
