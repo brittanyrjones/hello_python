@@ -29,6 +29,13 @@ jobs:
           python-version-file: pyproject.toml
         id: setup-python
 
+      - name: Debug Python versions
+        run: |
+          echo "Matrix Python version: ${{ matrix.python-version }}"
+          echo "PyProject Python version: ${{ steps.setup-python.outputs.python-version }}"
+          echo "Commit message: ${{ github.event.head_commit.message }}"
+          echo "Is release merge: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'Merge pull request') && contains(github.event.head_commit.message, 'release-v') }}"
+
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
@@ -50,7 +57,7 @@ jobs:
         run: uv build
 
       - name: Upload artifacts
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'Merge pull request') && contains(github.event.head_commit.message, 'release-v') && matrix.python-version == ${{ steps.setup-python.outputs.python-version }}
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'Merge pull request') && contains(github.event.head_commit.message, 'release-v') && matrix.python-version == '3.12'
         uses: actions/upload-artifact@v4
         with:
           name: release-artifacts-${{ github.ref_name }}
