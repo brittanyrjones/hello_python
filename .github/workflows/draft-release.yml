@@ -25,6 +25,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Ensure clean main branch
+        run: |
+          git checkout main
+          git pull origin main
+
       - name: Create release branch
         run: |
           chmod +x scripts/release/draft-release
