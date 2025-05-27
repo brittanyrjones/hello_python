@@ -40,10 +40,10 @@ jobs:
         run: uv pip install ruff
         
       - name: Run linting
-        run: ruff check .
+        run: uv run ruff check .
 
       - name: Run tests
-        run: tox
+        run: uv run tox
 
       - name: Build the artifact
         run: uv build
