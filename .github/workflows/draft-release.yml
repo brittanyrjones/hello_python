@@ -34,6 +34,4 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
       - name: Create release branch
-        run: |
-          chmod +x scripts/release/draft-release
-          ./scripts/release/draft-release "${{ github.event.inputs.bump_type }}" "${{ github.event.inputs.previous_version }}"
+        run: ./scripts/release/draft-release "${{ github.event.inputs.bump_type }}" "${{ github.event.inputs.previous_version }}"
