@@ -183,6 +183,38 @@ echo "Successfully pushed branch $BRANCH_NAME"
 # Create PR
 echo "Creating pull request..."
 
+# Default PR body if no template or template logic fails
+PR_BODY="## Changes\n\n- Updated version to $NEW_VERSION\n- Updated CHANGELOG.md with all changes since the previous release.\n\n## Checklist\n- [ ] Review changelog entries\n- [ ] Verify version bump\n- [ ] Test the changes\n- [ ] Approve the release\n- [ ] I've added or updated unit tests where necessary\n- [ ] I've added or updated documentation\n- [ ] I've run \`pdoc3\` to generate the documentation\n- [ ] I've manually tested the functionality in this PR\n- [ ] This pull request is ready for review"
+
+# Construct PR body from template
+PR_TEMPLATE=".github/PULL_REQUEST_TEMPLATE.md"
+TEMP_PR_BODY=$(mktemp)
+trap 'rm -f "$TEMP_PR_BODY"' EXIT
+
+if [ -f "$PR_TEMPLATE" ]; then
+    # Create a temporary file with the template
+    cp "$PR_TEMPLATE" "$TEMP_PR_BODY"
+
+    # Add our changes to the Summary section
+    sed -i '' '/^## Summary$/a\
+- Updated version to '"$NEW_VERSION"'\
+- Updated CHANGELOG.md with all changes since the previous release.' "$TEMP_PR_BODY"
+
+    # Add git log to What Changed section
+    echo "$GIT_LOG" > "$TEMP_PR_BODY.tmp"
+    sed -i '' '/^## What Changed$/r '"$TEMP_PR_BODY.tmp" "$TEMP_PR_BODY"
+    rm "$TEMP_PR_BODY.tmp"
+
+    # Add our checklist items
+    sed -i '' '/^## Checklist$/a\
+- [ ] Review changelog entries\
+- [ ] Verify version bump\
+- [ ] Test the changes\
+- [ ] Approve the release' "$TEMP_PR_BODY"
+
+    PR_BODY=$(cat "$TEMP_PR_BODY")
+fi
+
 # Try using gh CLI if available and authenticated
 if command -v gh &> /dev/null && gh auth status &> /dev/null; then
     if ! gh pr create \
@@ -228,35 +260,3 @@ else
 fi
 
 echo "Done! Review the changes and merge the pull request when ready."
-
-# Construct PR body from template
-PR_TEMPLATE=".github/PULL_REQUEST_TEMPLATE.md"
-TEMP_PR_BODY=$(mktemp)
-trap 'rm -f "$TEMP_PR_BODY"' EXIT
-
-# Default PR body if no template or template logic fails
-PR_BODY="## Changes\n\n- Updated version to $NEW_VERSION\n- Updated CHANGELOG.md with all changes since the previous release.\n\n## Checklist\n- [ ] Review changelog entries\n- [ ] Verify version bump\n- [ ] Test the changes\n- [ ] Approve the release\n- [ ] I've added or updated unit tests where necessary\n- [ ] I've added or updated documentation\n- [ ] I've run \`pdoc3\` to generate the documentation\n- [ ] I've manually tested the functionality in this PR\n- [ ] This pull request is ready for review"
-
-if [ -f "$PR_TEMPLATE" ]; then
-    # Create a temporary file with the template
-    cp "$PR_TEMPLATE" "$TEMP_PR_BODY"
-
-    # Add our changes to the Summary section
-    sed -i '' '/^## Summary$/a\
-- Updated version to '"$NEW_VERSION"'\
-- Updated CHANGELOG.md with all changes since the previous release.' "$TEMP_PR_BODY"
-
-    # Add git log to What Changed section
-    echo "$GIT_LOG" > "$TEMP_PR_BODY.tmp"
-    sed -i '' '/^## What Changed$/r '"$TEMP_PR_BODY.tmp" "$TEMP_PR_BODY"
-    rm "$TEMP_PR_BODY.tmp"
-
-    # Add our checklist items
-    sed -i '' '/^## Checklist$/a\
-- [ ] Review changelog entries\
-- [ ] Verify version bump\
-- [ ] Test the changes\
-- [ ] Approve the release' "$TEMP_PR_BODY"
-
-    PR_BODY=$(cat "$TEMP_PR_BODY")
-fi
