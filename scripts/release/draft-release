@@ -172,7 +172,7 @@ if ! git commit -m "Bump version to $NEW_VERSION"; then
 fi
 
 # Push branch
-if ! git push -u origin "$BRANCH_NAME"; then
+if ! git push -f -u origin "$BRANCH_NAME"; then
     echo "Error: Failed to push branch $BRANCH_NAME"
     git checkout main
     git branch -D "$BRANCH_NAME"
