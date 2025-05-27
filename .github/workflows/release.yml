@@ -16,6 +16,7 @@ jobs:
         with:
             name: build-artifacts-${{ github.ref_name }}
             path: dist/
+            merge-multiple: true
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
