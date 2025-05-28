@@ -24,24 +24,6 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Debug workflow run info
-        run: |
-          echo "Triggering workflow run ID: ${{ github.event.workflow_run.id }}"
-          echo "Triggering workflow name: ${{ github.event.workflow_run.name }}"
-          echo "Triggering workflow head_commit: ${{ github.event.workflow_run.head_commit.message }}"
-          echo "Triggering workflow head_branch: ${{ github.event.workflow_run.head_branch }}"
-          echo "Current workflow run ID: ${{ github.run_id }}"
-          echo "Current workflow name: ${{ github.workflow }}"
-          echo "Is from Test, Lint, and Build workflow: ${{ github.event.workflow_run.name == 'Test, Lint, and Build' }}"
-          echo "Workflow run URL: ${{ github.event.workflow_run.html_url }}"
-          echo "Workflow run status: ${{ github.event.workflow_run.conclusion }}"
-          echo "Workflow run artifacts URL: ${{ github.event.workflow_run.artifacts_url }}"
-
-      - name: List available artifacts
-        run: |
-          curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "${{ github.event.workflow_run.artifacts_url }}" | jq -r '.artifacts[] | "Name: \(.name), ID: \(.id), Size: \(.size_in_bytes)"'
-
       - name: Download artifact using GitHub CLI
         env:
           GH_TOKEN: ${{ github.token }}
@@ -49,34 +31,19 @@ jobs:
           mkdir -p dist
           gh run download ${{ github.event.workflow_run.id }} --name release-artifacts-main --dir dist/
 
-      - name: Debug dist directory contents
+      - name: Extract version from branch name
+        id: version
         run: |
-          echo "Contents of dist directory:"
-          ls -la dist/
-          echo "Artifact files to be uploaded:"
-          find dist -type f -name "*.whl" -o -name "*.tar.gz"
-
-      - name: Configure Git
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "github-actions@github.com"
-
-      - name: Debug commit info
-        run: |
-          echo "Commit message: ${{ github.event.workflow_run.head_commit.message }}"
-          echo "Head branch: ${{ github.event.workflow_run.head_branch }}"
-          echo "Base branch: ${{ github.event.workflow_run.base_branch }}"
-          echo "Pull request title: ${{ github.event.workflow_run.pull_requests[0].title }}"
-
-      - name: Extract release branch
-        id: release_branch
-        run: |
-          BRANCH=$(echo "${{ github.event.workflow_run.head_commit.message }}" | grep -o 'release-v[0-9]\+\.[0-9]\+\.[0-9]\+')
-          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
-          echo "Extracted branch: $BRANCH"
+          BRANCH_NAME="${{ github.event.workflow_run.head_branch }}"
+          VERSION=${BRANCH_NAME#release-v}
+          VERSION=${VERSION#release/}
+          VERSION=${VERSION#release-}
 
       - name: Create and push tag
-        run: ./scripts/release/create-tag "${{ steps.release_branch.outputs.branch }}"
+        run: |
+          git tag "v${{ steps.version.outputs.version }}" -m "Release v${{ steps.version.outputs.version }}"
+          git push origin "v${{ steps.version.outputs.version }}" 
+          echo "Created and pushed tag v$VERSION"
 
       - name: Get tag name
         id: get_tag
