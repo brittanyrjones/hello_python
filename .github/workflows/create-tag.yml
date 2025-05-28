@@ -10,7 +10,7 @@ on:
 
 jobs:
   push-git-tag:
-    if: ${{ github.event.workflow_run.conclusion == 'success' && contains(github.event.workflow_run.head_branch, 'release') }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && contains(github.event.workflow_run.head_commit.message, 'Merge pull request') && contains(github.event.workflow_run.head_commit.message, 'release-v') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -18,6 +18,14 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download artifacts
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: test-lint-build.yml
+          run_id: ${{ github.event.workflow_run.id }}
+          name: release-artifacts-${{ github.ref_name }}
+          path: dist/
 
       - name: Create and push tag
         run: ./scripts/release/create-tag.sh "${{ github.event.workflow_run.head_branch }}" 
