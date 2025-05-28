@@ -46,7 +46,7 @@ jobs:
           fi
           
           # Get the most recent successful build workflow run for this commit
-          RUN_ID=$(gh run list --workflow "Test, Lint, and Build.yml" --branch main --json databaseId,conclusion,headSha --jq ".[] | select(.headSha == \"$COMMIT_SHA\" and .conclusion == \"success\") | .databaseId" | head -n 1)
+          RUN_ID=$(gh run list --workflow "test-lint-build.yml" --branch main --json databaseId,conclusion,headSha --jq ".[] | select(.headSha == \"$COMMIT_SHA\" and .conclusion == \"success\") | .databaseId" | head -n 1)
           
           if [ -z "$RUN_ID" ]; then
             echo "No successful build found for commit $COMMIT_SHA"
