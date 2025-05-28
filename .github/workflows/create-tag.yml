@@ -77,9 +77,17 @@ jobs:
       - name: Create and push tag
         run: ./scripts/release/create-tag "${{ steps.release_branch.outputs.branch }}"
 
+      - name: Get tag name
+        id: get_tag
+        run: |
+          TAG=$(git describe --tags --abbrev=0)
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Using tag: $TAG"
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.get_tag.outputs.tag }}
           files: |
             dist/*.whl
             dist/*.tar.gz
