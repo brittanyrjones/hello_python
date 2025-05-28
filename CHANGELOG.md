@@ -3,6 +3,71 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.0.0](https://github.com/brittanyrjones/hello_python/compare/HEAD...7.0.0) - 2025-05-28
+
+
+### Changes
+
+
+### Other
+
+* testing
+* Bump version to 6.0.0
+* Testing
+* Bump version to 5.0.0
+* testing
+* d
+* Bump version to 4.0.0
+* tesitng
+* testing
+* Bump version to 3.0.0
+* testing
+* testing
+* testing
+* tesitng
+* Bump version to 2.0.0
+* resting
+* testing
+* Bump version to 1.0.0
+* testing
+* testing
+* install ruff
+* : (
+* just in case no pr body
+* testing auth
+* testing
+* testing git config
+* testing git config
+* oops
+* oops
+* auth
+* force?
+* git auth
+* perms
+* perms
+* testing sed
+* testing sed
+* testing
+* where is it
+* chmod remove
+* testing gh CI
+* clean branch
+* extra arg
+* remove .sh
+* remove .sh
+* change name
+* testing some new release things
+* testing
+* testing
+* cleanup version bump
+* change ver
+* tox testing
+* testing
+* tesing actions workflows
+* ignore
+* initial commit
+* Initial commit
+
 # [6.0.0](https://github.com/brittanyrjones/hello_python/compare/HEAD...6.0.0) - 2025-05-28
 
 
