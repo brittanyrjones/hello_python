@@ -12,7 +12,6 @@ permissions:
   contents: write
   actions: read
   id-token: write
-  packages: write
 
 jobs:
   check_for_moratorium:
@@ -21,8 +20,6 @@ jobs:
     environment: change_management
     steps:
       - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
       - env:
           TPS_API_TOKEN: ${{ secrets.TPS_API_TOKEN_PARAM }}
         run: ./scripts/release/tps-check-lock hello_python ${{ github.sha }}
@@ -34,31 +31,19 @@ jobs:
     environment: change_management
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for Trusted Publishing
-      contents: write
-      packages: write
     steps:
       - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get latest build workflow run
         id: get_workflow
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          if [[ "${{ github.ref_type }}" == "tag" ]]; then
-            # For tag pushes, get the commit SHA from the tag
-            COMMIT_SHA=$(git rev-parse ${{ github.ref }})
-          else
-            # For branch pushes, use the current SHA
-            COMMIT_SHA=${{ github.sha }}
-          fi
-          
           # Get the most recent successful build workflow run for this commit
-          RUN_ID=$(gh run list --workflow "test-lint-build.yml" --branch main --json databaseId,conclusion,headSha --jq ".[] | select(.headSha == \"$COMMIT_SHA\" and .conclusion == \"success\") | .databaseId" | head -n 1)
+          RUN_ID=$(gh run list --workflow "test-lint-build.yml" --branch main --json databaseId,conclusion,headSha --jq ".[] | select(.headSha == \"${{ github.sha }}\" and .conclusion == \"success\") | .databaseId" | head -n 1)
           
           if [ -z "$RUN_ID" ]; then
-            echo "No successful build found for commit $COMMIT_SHA"
+            echo "No successful build found for commit ${{ github.sha }}"
             exit 1
           fi
           
@@ -67,7 +52,7 @@ jobs:
 
       - name: Download build artifacts
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p dist
           gh run download ${{ steps.get_workflow.outputs.run_id }} --name release-artifacts-main --dir dist/
