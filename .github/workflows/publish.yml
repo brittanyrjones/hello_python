@@ -5,19 +5,6 @@ on:
     tags:
       - 'v*'
       - 'v[0-9]+.[0-9]+.[0-9]+'
-  workflow_dispatch:
-    inputs:
-      build_ref:
-        description: 'Branch, tag, or commit SHA to publish to testpypi'
-        required: true
-        default: 'main'
-      target:
-        description: 'Target repository to publish to'
-        required: true
-        default: 'testpypi'
-        type: choice
-        options:
-          - testpypi
 
 permissions:
   contents: read
