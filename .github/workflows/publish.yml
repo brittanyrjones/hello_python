@@ -78,8 +78,10 @@ jobs:
           cache-dependency-glob: pyproject.toml
 
       - name: Release to Test PyPI
-        run: uv publish --index testpypi dist/*
-
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          
       - name: Publish To Change Management
         env:
           ACTOR_EMAIL: ${{ secrets.TPS_API_RELEASE_ACTOR_EMAIL }}
