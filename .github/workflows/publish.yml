@@ -29,6 +29,9 @@ jobs:
     needs: check_for_moratorium
     runs-on: ubuntu-latest
     environment: change_management
+    permissions:
+      # IMPORTANT: this permission is mandatory for Trusted Publishing
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
