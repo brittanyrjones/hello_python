@@ -67,6 +67,12 @@ legacy_tox_ini = """
 envlist = py310, py311, py312, py313
 skip_missing_interpreters = true
 
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"
+explicit = true
+
 [testenv]
 extras = test
 deps =

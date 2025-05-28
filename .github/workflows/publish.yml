@@ -69,7 +69,7 @@ jobs:
           cache-dependency-glob: pyproject.toml
 
       - name: Release to Test PyPI
-        run: uv publish --repository https://test.pypi.org/legacy/ dist/*
+        run: uv publish --index testpypi dist/*
 
       - name: Publish To Change Management
         env:
