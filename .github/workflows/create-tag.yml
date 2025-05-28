@@ -48,6 +48,13 @@ jobs:
           mkdir -p dist
           gh run download ${{ github.event.workflow_run.id }} --name release-artifacts-main --dir dist/
 
+      - name: Debug dist directory contents
+        run: |
+          echo "Contents of dist directory:"
+          ls -la dist/
+          echo "Artifact files to be uploaded:"
+          find dist -type f -name "*.whl" -o -name "*.tar.gz"
+
       - name: Configure Git
         run: |
           git config --global user.name "GitHub Actions"
