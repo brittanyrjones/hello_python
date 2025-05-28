@@ -28,6 +28,9 @@ jobs:
           echo "Current workflow run ID: ${{ github.run_id }}"
           echo "Current workflow name: ${{ github.workflow }}"
           echo "Is from Test, Lint, and Build workflow: ${{ github.event.workflow_run.name == 'Test, Lint, and Build' }}"
+          echo "Workflow run URL: ${{ github.event.workflow_run.html_url }}"
+          echo "Workflow run status: ${{ github.event.workflow_run.conclusion }}"
+          echo "Workflow run artifacts URL: ${{ github.event.workflow_run.artifacts_url }}"
 
       - name: Download artifacts
         uses: actions/download-artifact@v4
@@ -35,8 +38,7 @@ jobs:
           name: release-artifacts-main
           path: dist/
           merge-multiple: false
-          repository: brittanyrjones/hello_python
           run-id: ${{ github.event.workflow_run.id }}
 
       - name: Create and push tag
-        run: ./scripts/release/create-tag.sh "${{ github.event.workflow_run.head_branch }}" 
+        run: ./scripts/release/create-tag "${{ github.event.workflow_run.head_branch }}"
