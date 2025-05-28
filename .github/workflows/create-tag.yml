@@ -48,6 +48,7 @@ jobs:
           path: dist/
           merge-multiple: false
           run-id: ${{ github.event.workflow_run.id }}
+          pattern: '**'
 
       - name: Create and push tag
         run: ./scripts/release/create-tag "${{ github.event.workflow_run.head_branch }}"
