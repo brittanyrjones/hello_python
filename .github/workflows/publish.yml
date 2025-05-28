@@ -34,6 +34,8 @@ jobs:
 
       - name: Get latest build workflow run
         id: get_workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if [[ "${{ github.ref_type }}" == "tag" ]]; then
             # For tag pushes, get the commit SHA from the tag
