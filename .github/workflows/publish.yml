@@ -2,7 +2,6 @@ name: Publish to Test PyPI
 
 on:
   push:
-    branches: [ "main" ]
     tags:
       - "*"
 
@@ -28,12 +27,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Get latest build workflow run
+        id: get_workflow
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            # For tag pushes, get the commit SHA from the tag
+            COMMIT_SHA=$(git rev-parse ${{ github.ref }})
+          else
+            # For branch pushes, use the current SHA
+            COMMIT_SHA=${{ github.sha }}
+          fi
+          
+          # Get the most recent successful build workflow run for this commit
+          RUN_ID=$(gh run list --workflow "Test, Lint, and Build.yml" --branch main --json databaseId,conclusion,headSha --jq ".[] | select(.headSha == \"$COMMIT_SHA\" and .conclusion == \"success\") | .databaseId" | head -n 1)
+          
+          if [ -z "$RUN_ID" ]; then
+            echo "No successful build found for commit $COMMIT_SHA"
+            exit 1
+          fi
+          
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+          echo "Found build workflow run: $RUN_ID"
+
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: release-artifacts-${{ github.event.inputs.build_ref || github.ref_name }}
-          path: dist/
-          merge-multiple: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p dist
+          gh run download ${{ steps.get_workflow.outputs.run_id }} --name release-artifacts-main --dir dist/
 
       - name: Release to Test PyPI
         if: ${{ github.event.inputs.target == 'testpypi' }}
