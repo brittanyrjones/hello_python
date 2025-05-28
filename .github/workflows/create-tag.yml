@@ -41,14 +41,14 @@ jobs:
           curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             "${{ github.event.workflow_run.artifacts_url }}" | jq -r '.artifacts[] | "Name: \(.name), ID: \(.id), Size: \(.size_in_bytes)"'
 
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: release-artifacts-main
-          path: dist/
-          merge-multiple: false
-          run-id: ${{ github.event.workflow_run.id }}
-          pattern: '**'
+      - name: Download artifact directly
+        run: |
+          mkdir -p dist
+          curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/brittanyrjones/hello_python/actions/artifacts/3214132805/zip" \
+            -o artifact.zip
+          unzip artifact.zip -d dist/
+          rm artifact.zip
 
       - name: Create and push tag
         run: ./scripts/release/create-tag "${{ github.event.workflow_run.head_branch }}"
