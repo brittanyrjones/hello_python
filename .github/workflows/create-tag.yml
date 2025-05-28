@@ -38,12 +38,18 @@ jobs:
           VERSION=${BRANCH_NAME#release-v}
           VERSION=${VERSION#release/}
           VERSION=${VERSION#release-}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github-actions@github.com"
 
       - name: Create and push tag
         run: |
           git tag "v${{ steps.version.outputs.version }}" -m "Release v${{ steps.version.outputs.version }}"
           git push origin "v${{ steps.version.outputs.version }}" 
-          echo "Created and pushed tag v$VERSION"
+          echo "Created and pushed tag v${{ steps.version.outputs.version }}"
 
       - name: Get tag name
         id: get_tag
