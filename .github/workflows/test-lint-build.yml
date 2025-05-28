@@ -29,6 +29,18 @@ jobs:
           python-version-file: pyproject.toml
         id: setup-python
 
+      - name: Debug versions and commit
+        run: |
+          echo "Matrix Python version: ${{ matrix.python-version }}"
+          echo "PyProject Python version: ${{ steps.setup-python.outputs.python-version }}"
+          echo "Event name: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Commit message: ${{ github.event.head_commit.message }}"
+          echo "Is matching version: ${{ matrix.python-version == steps.setup-python.outputs.python-version }}"
+          echo "Is push to main: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}"
+          echo "Contains release-v: ${{ contains(github.event.head_commit.message, 'release-v') }}"
+          echo "Full condition: ${{ matrix.python-version == steps.setup-python.outputs.python-version && github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'release-v') }}"
+
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
