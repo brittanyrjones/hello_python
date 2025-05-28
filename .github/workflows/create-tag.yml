@@ -34,11 +34,9 @@ jobs:
       - name: Extract version from branch name
         id: version
         run: |
-          BRANCH_NAME="${{ github.event.workflow_run.head_branch }}"
-          VERSION=${BRANCH_NAME#release-v}
-          VERSION=${VERSION#release/}
-          VERSION=${VERSION#release-}
+          VERSION=$(echo "${{ github.event.workflow_run.head_commit.message }}" | grep -o 'release-v[0-9]\+\.[0-9]\+\.[0-9]\+' | sed 's/release-v//')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
 
       - name: Configure Git
         run: |
