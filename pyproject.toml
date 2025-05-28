@@ -17,7 +17,7 @@ dependencies = [
 docs = ["pdoc3"]
 
 [tool.hatch.build]
-packages = ["hello_python"]
+packages = ["hello_python_bjones"]
 
 [project.urls]
 Homepage = "https://github.com/brittanyrjones/hello_python"
