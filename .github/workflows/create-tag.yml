@@ -1,4 +1,4 @@
-name: Create Tag
+name: Create Tag and Release
 
 on:
   workflow_run:
@@ -69,3 +69,11 @@ jobs:
 
       - name: Create and push tag
         run: ./scripts/release/create-tag "${{ steps.release_branch.outputs.branch }}"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
+          generate_release_notes: true
