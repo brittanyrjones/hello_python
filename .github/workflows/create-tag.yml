@@ -11,6 +11,7 @@ on:
 permissions:
   contents: write
   actions: read
+  id-token: write
 
 jobs:
   push-git-tag:
