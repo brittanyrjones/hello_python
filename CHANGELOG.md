@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [18.0.0](https://github.com/brittanyrjones/hello_python/compare/v17.0.0...18.0.0) - 2025-05-28
+
+
+### Changes
+
+
+### Other
+
+* t
+
 # [17.0.0](https://github.com/brittanyrjones/hello_python/compare/v16.0.0...17.0.0) - 2025-05-28
 
 
