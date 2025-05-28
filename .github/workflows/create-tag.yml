@@ -20,10 +20,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download artifacts
-        uses: dawidd6/action-download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
-          workflow: test-lint-build.yml
-          run_id: ${{ github.event.workflow_run.id }}
           name: release-artifacts-${{ github.ref_name }}
           path: dist/
 
