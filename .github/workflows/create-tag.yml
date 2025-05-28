@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+  actions: read
+
 jobs:
   push-git-tag:
     if: ${{ github.event.workflow_run.conclusion == 'success' && contains(github.event.workflow_run.head_commit.message, 'Merge pull request') && contains(github.event.workflow_run.head_commit.message, 'release-v') }}
@@ -31,6 +35,11 @@ jobs:
           echo "Workflow run URL: ${{ github.event.workflow_run.html_url }}"
           echo "Workflow run status: ${{ github.event.workflow_run.conclusion }}"
           echo "Workflow run artifacts URL: ${{ github.event.workflow_run.artifacts_url }}"
+
+      - name: List available artifacts
+        run: |
+          curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "${{ github.event.workflow_run.artifacts_url }}" | jq -r '.artifacts[] | "Name: \(.name), ID: \(.id), Size: \(.size_in_bytes)"'
 
       - name: Download artifacts
         uses: actions/download-artifact@v4
