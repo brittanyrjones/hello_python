@@ -3,13 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-<<<<<<< HEAD
-name = "hello_bjones"
-version = "39.0.0"
-=======
 name = "hello_python"
 version = "38.0.0"
->>>>>>> 5c0941f (t)
 description = "Simple test"
 readme = "README.md"
 requires-python = ">=3.10"
