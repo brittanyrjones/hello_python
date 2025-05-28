@@ -60,12 +60,12 @@ jobs:
           echo "Base branch: ${{ github.event.workflow_run.base_branch }}"
           echo "Pull request title: ${{ github.event.workflow_run.pull_requests[0].title }}"
 
-      - name: Extract version from commit message
-        id: version
+      - name: Extract release branch
+        id: release_branch
         run: |
-          VERSION=$(echo "${{ github.event.workflow_run.head_commit.message }}" | grep -o 'release-v[0-9]\+\.[0-9]\+\.[0-9]\+' | sed 's/release-v//')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Extracted version: $VERSION"
+          BRANCH=$(echo "${{ github.event.workflow_run.head_commit.message }}" | grep -o 'release-v[0-9]\+\.[0-9]\+\.[0-9]\+')
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+          echo "Extracted branch: $BRANCH"
 
       - name: Create and push tag
-        run: ./scripts/release/create-tag "${{ github.event.workflow_run.pull_requests[0].head.ref }}"
+        run: ./scripts/release/create-tag "${{ steps.release_branch.outputs.branch }}"
