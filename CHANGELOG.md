@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.0.0](https://github.com/brittanyrjones/hello_python/compare/v13.0.0...14.0.0) - 2025-05-28
+
+
+### Changes
+
+
+### Other
+
+* t
+
 # [13.0.0](https://github.com/brittanyrjones/hello_python/compare/v12.0.0...13.0.0) - 2025-05-28
 
 
