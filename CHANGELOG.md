@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [21.0.0](https://github.com/brittanyrjones/hello_python/compare/vmain...21.0.0) - 2025-05-28
+
+
+### Changes
+
+
+### Other
+
+* t
+
 # [20.0.0](https://github.com/brittanyrjones/hello_python/compare/v18.0.0...20.0.0) - 2025-05-28
 
 
