@@ -34,6 +34,15 @@ jobs:
         run: |
           VERSION=$(grep "requires-python" pyproject.toml | sed 's/requires-python = ">=\(.*\)"/\1/')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Matrix Python version: ${{ matrix.python-version }}"
+          echo "PyProject Python version: $VERSION"
+          echo "Event name: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Commit message: ${{ github.event.head_commit.message }}"
+          echo "Is matching version: ${{ matrix.python-version == steps.pyproject-version.outputs.version }}"
+          echo "Is push to main: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}"
+          echo "Contains release-v: ${{ contains(github.event.head_commit.message, 'release-v') }}"
+          echo "Full condition: ${{ matrix.python-version == steps.pyproject-version.outputs.version && github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'release-v') }}"
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
