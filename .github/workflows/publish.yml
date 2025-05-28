@@ -1,8 +1,12 @@
 name: Publish to Test PyPI
 
 on:
-  release:
-    types: [created]
+  workflow_run:
+    workflows: ["Create Tag and Release"]
+    types:
+      - completed
+    branches:
+      - main
 
 permissions:
   contents: write
