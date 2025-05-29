@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [44.0.0](https://github.com/brittanyrjones/hello_python/compare/v43.0.0...44.0.0) - 2025-05-29
+
+
+### Changes
+
+
+### Other
+
+* t
+* t
+* t
+* t
+* t
+
 # [43.0.0](https://github.com/brittanyrjones/hello_python/compare/v42.0.0...43.0.0) - 2025-05-28
 
 
