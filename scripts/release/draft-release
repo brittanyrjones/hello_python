@@ -204,21 +204,21 @@ if [ -f "$PR_TEMPLATE" ]; then
     cp "$PR_TEMPLATE" "$TEMP_PR_BODY"
 
     # Add our changes to the Summary section
-    sed -i '' -e '/^## Summary$/a\
-- Updated version to '"$NEW_VERSION"'\
-- Updated CHANGELOG.md with all changes since the previous release.' "$TEMP_PR_BODY"
+    sed -i '' -e "/^## Summary$/a\\
+- Updated version to $NEW_VERSION\\
+- Updated CHANGELOG.md with all changes since the previous release." "$TEMP_PR_BODY"
 
     # Add git log to What Changed section
     echo "$GIT_LOG" > "$TEMP_PR_BODY.tmp"
-    sed -i '' -e '/^## What Changed$/r '"$TEMP_PR_BODY.tmp" "$TEMP_PR_BODY"
+    sed -i '' -e "/^## What Changed$/r $TEMP_PR_BODY.tmp" "$TEMP_PR_BODY"
     rm "$TEMP_PR_BODY.tmp"
 
     # Add our checklist items
-    sed -i '' -e '/^## Checklist$/a\
-- [ ] Review changelog entries\
-- [ ] Verify version bump\
-- [ ] Test the changes\
-- [ ] Approve the release' "$TEMP_PR_BODY"
+    sed -i '' -e "/^## Checklist$/a\\
+- [ ] Review changelog entries\\
+- [ ] Verify version bump\\
+- [ ] Test the changes\\
+- [ ] Approve the release" "$TEMP_PR_BODY"
 
     PR_BODY=$(cat "$TEMP_PR_BODY")
 fi
