@@ -183,13 +183,21 @@ echo "Successfully pushed branch $BRANCH_NAME"
 # Create PR
 echo "Creating pull request..."
 
-# Default PR body if no template or template logic fails
-PR_BODY="## Changes\n\n- Updated version to $NEW_VERSION\n- Updated CHANGELOG.md with all changes since the previous release.\n\n## Checklist\n- [ ] Review changelog entries\n- [ ] Verify version bump\n- [ ] Test the changes\n- [ ] Approve the release\n- [ ] I've added or updated unit tests where necessary\n- [ ] I've added or updated documentation\n- [ ] I've run \`pdoc3\` to generate the documentation\n- [ ] I've manually tested the functionality in this PR\n- [ ] This pull request is ready for review"
-
 # Construct PR body from template
 PR_TEMPLATE=".github/PULL_REQUEST_TEMPLATE.md"
 TEMP_PR_BODY=$(mktemp)
 trap 'rm -f "$TEMP_PR_BODY"' EXIT
+
+# Get git log since previous tag
+PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+if [ -n "$PREV_TAG" ]; then
+    GIT_LOG=$(git log --pretty=format:"- %s" "$PREV_TAG"..HEAD)
+else
+    GIT_LOG=$(git log --pretty=format:"- %s" HEAD)
+fi
+
+# Default PR body if no template
+PR_BODY="## Changes\n\n- Updated version to $NEW_VERSION\n- Updated CHANGELOG.md with all changes since the previous release.\n\n## Checklist\n- [ ] Review changelog entries\n- [ ] Verify version bump\n- [ ] Test the changes\n- [ ] Approve the release\n- [ ] I've added or updated unit tests where necessary\n- [ ] I've added or updated documentation\n- [ ] I've run \`pdoc3\` to generate the documentation\n- [ ] I've manually tested the functionality in this PR\n- [ ] This pull request is ready for review"
 
 if [ -f "$PR_TEMPLATE" ]; then
     # Create a temporary file with the template
